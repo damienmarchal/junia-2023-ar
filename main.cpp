@@ -1,9 +1,10 @@
 #include <iostream>
+#include <vector>
+#include "Environement.h"
 
-using namespace std;
-
-int main()
-{
-    cout << "Hello World!" << endl;
+int main() {
+    Environement env(5, 5);
+    env.initMap(10,2);
+    env.printMap();
     return 0;
 }

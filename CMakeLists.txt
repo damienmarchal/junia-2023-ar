@@ -1,11 +1,16 @@
-cmake_minimum_required(VERSION 3.5)
-
-project(cours1 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.26)
+project(CoursC)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(cours1 main.cpp)
-
-install(TARGETS cours1
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+add_executable(CoursC main.cpp
+        Environement.cpp
+        Environement.h
+        Robot.cpp
+        Robot.h
+        Obstacle.cpp
+        Obstacle.h
+        Arbre.cpp
+        Arbre.h
+        Entite.cpp
+        Entite.h)
