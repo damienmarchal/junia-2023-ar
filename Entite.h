@@ -9,13 +9,23 @@
 
 class Entite {
 public:
+    // attributs
     int position[2];
     std::string nom;
+
+    // Constructor
     Entite(int x, int y);
+
+    // Destructor
     virtual ~Entite() = default;
-    void set_Position(int x, int y);
+
+    // Getters
     std::string getNom() ;
     int* getPosition();
+
+    // Setters
+    void set_Position(int x, int y);
+
 };
 
 

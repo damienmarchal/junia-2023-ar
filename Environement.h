@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "Entite.h"
-#include "Robot.h"
+#include "Robot/Robot.h"
 /*
 #include "Obstacle.h"
 #include "Arbre.h"
@@ -21,16 +21,28 @@ class Environement {
    int size[2];// taile de la map 0:lignes 1:colonnes
 
 public:
+    // constructor
     Environement(int x, int y);
+
+    // destructor
+    ~Environement();
+
+    // getters
+    int* getSize();
+    std::vector<std::vector<Entite*>> getMap();
+
+    // setters
+
+    // methods
     void initMap(int pourcentageArbre,int nombreRobot);
     void printMap();
-    int* getSize();
-    void arroser(Robot* robot);
+
+    // TODO : changer les fonctions arooser pour les mettre dans la classe robot
+    void arroser(Robot* robot); // arrose les cases autour du robot
 /*
     void addRobot(Robot robot);
     void addArbre(Arbre arbre, int x, int y);
 */
-
 
     void genereArbre(int pourcentage);
 };

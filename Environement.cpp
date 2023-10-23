@@ -9,8 +9,9 @@
 
 #include "Environement.h"
 #include "Arbre.h"
-#include "Robot.h"
+#include "Robot/Robot.h"
 
+// constructor
 Environement::Environement(int width, int height)  {
     this->size[0] = width;
     this->size[1] = height;
@@ -24,6 +25,10 @@ Environement::Environement(int width, int height)  {
         this->map.push_back(ligne);
     }
 }
+
+// destructor
+Environement::~Environement() = default;
+
 
 void Environement::printMap() {
     for (int i = 0; i < this->size[0]; i++) {
@@ -145,6 +150,11 @@ void Environement::arroser(Robot *robot) {
     }
 
 }
+
+std::vector<std::vector<Entite *>> Environement::getMap() {
+    return this->map;
+}
+
 
 /*
 void Environement::addArbre(Arbre arbre, int x, int y) {
