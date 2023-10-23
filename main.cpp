@@ -1,10 +1,11 @@
 #include <iostream>
 #include <vector>
-#include "Environement.h"
+#include "Environment.h"
 
 int main() {
-    Environement env(5, 5);
+    Environment env(5, 5);
     env.initMap(10,2);
     env.printMap();
+
     return 0;
 }

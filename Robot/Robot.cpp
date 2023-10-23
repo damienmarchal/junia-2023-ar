@@ -47,7 +47,7 @@ void Robot::move(Direction direction) {
     }
 }
 
-std::vector<std::vector<Entite*>> Robot::getScannerData(Environement env,int range) {
+std::vector<std::vector<Entite*>> Robot::getScannerData(Environment &env, int range) {
     /*
      * Permet de regarder autour du robot dans un rayon donné
      * @param range: rayon de vision du robot (en nombre de cases) (carré de neuf cases)
@@ -84,6 +84,7 @@ std::vector<std::vector<Entite*>> Robot::getScannerData(Environement env,int ran
             std::cout << "Erreur: range invalide" << std::endl;
             break;
     }
+
     return data;
 }
 

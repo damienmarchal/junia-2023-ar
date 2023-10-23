@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "../Entite.h"
-#include "../Environement.h"
+#include "../Environment.h"
 
 class Robot : public Entite {
 public:
@@ -37,7 +37,7 @@ public:
 
     // Methods
     void move(Direction direction);
-    std::vector<std::vector<Entite*>> getScannerData(Environement env, int range);
+    std::vector<std::vector<Entite*>> getScannerData(Environment &env, int range);
 
 };
 
