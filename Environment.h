@@ -1,4 +1,6 @@
 #include<vector>
+#include"Etat.h>"
+
 class Environment {
 public:
     int size_x;

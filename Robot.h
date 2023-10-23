@@ -1,4 +1,6 @@
 #include "Environment.h"
+#include <iostream>
+#include <vector>
 
 class Robot {
 public:
