@@ -1,3 +1,4 @@
+#include<vector>
 class Environment {
 public:
     int size_x;

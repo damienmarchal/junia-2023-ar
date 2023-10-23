@@ -1,3 +1,6 @@
+#include <iostream>
+#include<vector>
+
 class Environment {
 public:
     int size_x;
@@ -17,13 +20,4 @@ public:
     }
 };
 
-std::ostream& operator<<(std::ostream& s, Environment& map) {
-    for (int y = 0; y < map.size_y; y++) {
-        for (int x = 0; x < map.size_x; x++) {
-            s << map.map_etat[y][x] << " | ";
 
-        }
-        s << std::endl;
-    };
-    return s;
-}
