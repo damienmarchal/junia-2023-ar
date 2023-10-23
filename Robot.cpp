@@ -1,34 +1,23 @@
 
 #include "Robot.h"
 
-
-class Robot {
-public:
-    int id;
-    int pos_x;
-    int pos_y;
-    Robot(int id, Environment& map, int pos_x, int pos_y) {
+    Robot::Robot(int id, Environment& map, int pos_x, int pos_y) {
         this->id = id;
         this->pos_x = pos_x;
         this->pos_y = pos_y;
         map.map_etat[pos_y][pos_x] = Etat::robot;
     }
 
-    int get_id() {
+    Robot::get_id() {
         return this->id;
     }
-    int get_pos_x() {
+    Robot::get_pos_x() {
         return this->pos_x;
     }
-    int get_pos_y() {
+    Robot::get_pos_y() {
         return this->pos_y;
     }
-
-
-
-
-
-    void planter(Environment& map) {
+    Robot::planter(Environment& map) {
         //par défaut après avoir planter le robot se décale sur la droite
         if (this->pos_x <= map.size_x - 2 and map.map_etat[this->pos_y][this->pos_x + 1] == Etat::libre) {
             map.map_etat[this->pos_y][this->pos_x] = Etat::arbre;
@@ -59,14 +48,7 @@ public:
         }
 
     }
-
-
-
-
-
-
-
-    void deplacer(Environment& map, int dir) {
+    Robot::deplacer(Environment& map, int dir) {
         if (dir == 0) {
             //déplacement vers le haut 
             if (this->pos_y >= 1 and map.map_etat[this->pos_y - 1][this->pos_x] == Etat::libre) {
@@ -117,5 +99,5 @@ public:
 
     }
 
-};
+
 

@@ -1,13 +1,6 @@
 #include <iostream>
 #include "Environment.h"
-
-class Environment {
-public:
-    int size_x;
-    int size_y;
-    std::vector<std::vector<Etat>> map_etat;
-
-    Environment(int size_x, int size_y) {
+ Environment::Environment(int size_x, int size_y) {
         this->size_x = size_x;
         this->size_y = size_y;
 
@@ -18,6 +11,5 @@ public:
             }
         }
     }
-};
 
 

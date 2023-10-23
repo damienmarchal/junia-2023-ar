@@ -16,14 +16,9 @@ public:
     int get_pos_x();
     int get_pos_y();
 
-
-
-
-
     void planter(Environment& map);
 
     void deplacer(Environment& map, int dir);
 
 };
 
-#pragma once
