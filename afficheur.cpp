@@ -1,5 +1,5 @@
 
-#include"Etat.h"
+#include"afficheur.h"
 
 std::ostream& operator<<(std::ostream& s, Etat& e) {
     switch (e) {
