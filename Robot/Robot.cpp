@@ -2,9 +2,11 @@
 // Created by cload on 16/10/2023.
 //
 
-#include "Robot.h"
-
 #include <utility>
+
+
+#include "Robot.h"
+#include "../Arbre.h"
 
 // constructors
 Robot::Robot(int x, int y) : Entite(x, y) {
@@ -86,6 +88,41 @@ std::vector<std::vector<Entite*>> Robot::getScannerData(Environment &env, int ra
     }
 
     return data;
+}
+
+void Robot::action(Environment &env) {
+    /*
+     * Permet de faire agir le robot
+     * @param env: environement dans lequel le robot se trouve
+     */
+
+    // récupère les données du scanner
+    std::vector<std::vector<Entite*>> data = this->getScannerData(env, 1);
+
+    // on parcours les cases autour du robot
+    for (int i = 0; i < data.size(); ++i) {
+        for (int j = 0; j < data[i].size(); ++j) {
+            // on regarde si la case est un arbre
+            if (data[i][j]->getNom() == "A") {
+                // on caste la case en arbre
+                Arbre *arbre = dynamic_cast<Arbre *>(data[i][j]);
+                // on regarde si l'arbre est planté
+                if (arbre->getStatutArbre() == Arbre::Etat::planted) {
+                    // on regarde si le robot a de l'eau
+                    if (this->getCapacity() > 0) {
+                        // on arrose l'arbre
+                        arbre->arroser();
+                        // on enlève de l'eau au robot
+                        this->setCapacity(this->getCapacity() - 1);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Robot::turn() {
+    this->orientation = (Direction) ((int) this->orientation + 1);
 }
 
 

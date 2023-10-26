@@ -37,7 +37,9 @@ public:
 
     // Methods
     void move(Direction direction);
+    void turn();
     std::vector<std::vector<Entite*>> getScannerData(Environment &env, int range);
+    void action(Environment &env);
 
 };
 

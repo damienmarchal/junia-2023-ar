@@ -6,6 +6,7 @@
 #include <vector>
 #include <chrono>
 #include <random>
+#include <unistd.h> // Permet de faire le sleep
 
 #include "Environment.h"
 #include "Arbre.h"
@@ -29,8 +30,21 @@ Environment::Environment(int width, int height)  {
 // destructor
 Environment::~Environment() = default;
 
+// getters
+int *Environment::getSize() {
+    return this->size;
+}
+std::vector<std::vector<Entite *>> Environment::getMap() {
+    return this->map;
+}
+bool Environment::getRunning() { return this->running; }
 
+// setters
+void Environment::setRunning(bool running) { this->running = running; }
+
+// methods
 void Environment::printMap() {
+    std::cout << std::endl;
     for (int i = 0; i < this->size[0]; i++) {
         for (int j = 0; j < this->size[1]; j++) {
             std::cout << this->map[i][j]->getNom() <<" | " <<std::flush;
@@ -83,23 +97,7 @@ void Environment::genereArbre(int pourcentage){
 
 }
 
-void Environment::initMap(int pourcentageArbre, int nombreRobot) {
-    /* Permet d'ajouter des obstacles à la map */
-
-    // on ajoute des murs sur les bords
-    for (int i = 0; i < this->size[0]; i++) {
-        for (int j = 0; j < this->size[1]; j++) {
-            if (i == 0 || j == 0 || i == this->size[0] - 1 || j == this->size[1] - 1) {
-                this->map[i][j] = new Obstacle(i, j, true);
-            }
-        }
-    }
-
-    // on ajoute des arbres aléatoirement
-    genereArbre(pourcentageArbre);
-
-    // on ajoute des robots aléatoirement
-
+void Environment::genereRobot(int nombreRobot){
     // génération de random
     std::random_device rd;
     std::mt19937::result_type seed = rd() ^ (
@@ -117,22 +115,68 @@ void Environment::initMap(int pourcentageArbre, int nombreRobot) {
 
     std::uniform_int_distribution<unsigned> distrib(1, std::max(env.getSize()[0], env.getSize()[1]) - 1);
     for (int i = 0; i < nombreRobot; i++) {
-        int x = distrib(gen) ;
+        int x = distrib(gen);
         int y = distrib(gen);
         // vérifie si la case est vide
         if(this->map[x][y]->getNom() == "_"){
-          this->map[x][y] = new Robot(x, y); // on ajoute l'arbre à la map
+            this->map[x][y] = new Robot(x, y); // on ajoute l'arbre à la map
         }// passer cet iteration de boucle
         else{
             i--;
         }
     }
+}
+
+void Environment::initMap(int pourcentageArbre, int nombreRobot) {
+    /* Permet d'ajouter des obstacles à la map */
+
+    // on ajoute des murs sur les bords
+    for (int i = 0; i < this->size[0]; i++) {
+        for (int j = 0; j < this->size[1]; j++) {
+            if (i == 0 || j == 0 || i == this->size[0] - 1 || j == this->size[1] - 1) {
+                this->map[i][j] = new Obstacle(i, j, true);
+            }
+        }
+    }
+
+    // TODO : il y a un problème avec le random la dernière ligne et la dernière colone en 7x7 ne sont jamais rempli
+    // on ajoute des arbres aléatoirement
+    genereArbre(pourcentageArbre);
+
+    // on ajoute des robots aléatoirement
+    genereRobot(nombreRobot);
+
+    // on lance la simulation
+    this->running = true;
 
 }
 
-int *Environment::getSize() {
-    return this->size;
+void Environment::updateMap() {
+    /*
+     * Permet de mettre à jour la map
+     */
+
+    // Avant chaque update on prends 1000 ms de pause
+    sleep(1);
+
+    // Permet au arbre de grandir
+    for(auto item:this->allArbres){
+        // cast pour avoir sa class
+        Arbre* arbre = dynamic_cast<Arbre *>(item); // Permet de travailler avec le classe arbre
+        arbre->grandir();
+    }
+
+    // Demande à chaque robot l'action qu'il veut faire
+    for(auto item:this->allRobots){
+        // cast pour avoir sa class
+        Robot* robot = dynamic_cast<Robot *>(item); // Permet de travailler avec le classe arbre
+        robot->action(*this);
+    }
+
 }
+
+
+
 /*
 void Environment::arroser(Robot *robot) {
     // on récupère la position du robot
@@ -150,9 +194,7 @@ void Environment::arroser(Robot *robot) {
     }
 }
 */
-std::vector<std::vector<Entite *>> Environment::getMap() {
-    return this->map;
-}
+
 
 
 /*

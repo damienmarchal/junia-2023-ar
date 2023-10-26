@@ -10,6 +10,7 @@ class Obstacle : public Entite {
 
 public:
     bool isSolid;
+    Obstacle(int x, int y);
     Obstacle(int x, int y, bool isSolid);
 };
 
