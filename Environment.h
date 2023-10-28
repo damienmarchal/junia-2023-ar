@@ -10,6 +10,9 @@
 
 #include "Entite.h"
 
+#include "Arbre.h"
+
+
 class Environment {
     // crée un vecteur 2D de pointeur vers des entités
     std::vector<std::vector<Entite*>> map;
@@ -37,12 +40,16 @@ public:
     void printMap();
     void updateMap();
     void runSimulation();
+    void addArbre(Arbre arbre, int x, int y);
 
     // TODO : changer les fonctions arooser pour les mettre dans la classe robot
     //void arroser(Robot* robot); // arrose les cases autour du robot
 
     void genereArbre(int pourcentage);
     void genereRobot(int nombreRobot);
+    void genereRobotPlanteur(int nombreRobot);
+    void genereRobotArroseur(int nombreRobot);
+    void genereRobotRecolteur(int nombreRobot);
 };
 
 

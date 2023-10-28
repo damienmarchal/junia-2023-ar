@@ -13,23 +13,35 @@ Robot::Robot(int x, int y) : Entite(x, y) {
     this->nom = "R";
     this->position[0] = x;
     this->position[1] = y;
-    this->orientation = Direction::Nord;
+    this->direction = Direction::Nord;
+    this->orientation = 0;
+    this->actualManeuver = ActualManeuver::Idle;
 }
 
 // destructors
 Robot::~Robot() = default;
 
 // getters
+float *Robot::getDesiredPose() { return new float[3]{static_cast<float>(this->getPosition()[0]), static_cast<float>(this->getPosition()[1]), this->getOrientation()}; }
+float Robot::getOrientation() { return this->orientation; }
 float Robot::getBattery() { return this->battery; }
-
 float Robot::getCapacity() { return this->capacity; }
-
 float Robot::getSpeed() { return this->speed; }
+std::vector<std::vector<Entite *>> Robot::getLocalMap() { return this->localMap; }
+Robot::Direction Robot::getDirection() { return this->direction; }
+Robot::ActualManeuver Robot::getActualManeuver() { return this->actualManeuver; }
 
 // setters
+void Robot::setActualManeuver(Robot::ActualManeuver actualManeuver) { this->actualManeuver = actualManeuver; }
+void Robot::setOrientation(float orientation) { this->orientation = orientation; }
 void Robot::setBattery(float battery) { this->battery = battery; }
 void Robot::setCapacity(float capacity) { this->capacity = capacity; }
 void Robot::setSpeed(float speed) { this->speed = speed; }
+void Robot::setDesiredPose(float x, float y, float orientation) {
+    this->diseriedPose[0] = x;
+    this->diseriedPose[1] = y;
+    this->diseriedPose[2] = orientation;
+}
 
 // methods
 void Robot::move(Direction direction) {
@@ -122,7 +134,40 @@ void Robot::action(Environment &env) {
 }
 
 void Robot::turn() {
-    this->orientation = (Direction) ((int) this->orientation + 1);
+    this->direction = (Direction) ((int) this->direction + 1);
+}
+void Robot::priseDecision(Environment &env) {
+    return;
+}
+
+void Robot::Update(Environment &env) {
+    /*
+     * Permet de mettre à jour les données du robot
+     */
+    // TODO : mettre à jour les données du robot
+    // Nouvelle carte
+    this->localMap = this->getScannerData(env, 1);
+    // Nouvelle position
+    // Nouvelle orientation
+    // Nouvelle direction
+    // Nouvelle batterie
+    // Nouvelle capacité
+    // Nouvelle vitesse
+    return;
+}
+
+bool Robot::isFree() {
+    switch (this->getDirection()) {
+        case Direction::Nord:
+            return this->getLocalMap()[this->getPosition()[0] - 1][this->getPosition()[1]]->getNom() == "_";
+        case Direction::Est:
+            return this->getLocalMap()[this->getPosition()[0]][this->getPosition()[1] + 1]->getNom() == "_";
+        case Direction::Sud:
+            return this->getLocalMap()[this->getPosition()[0] + 1][this->getPosition()[1]]->getNom() == "_";
+        case Direction::Ouest:
+            return this->getLocalMap()[this->getPosition()[0]][this->getPosition()[1] - 1]->getNom() == "_";
+    }
+    return false;
 }
 
 

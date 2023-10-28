@@ -11,7 +11,9 @@
 #include "Environment.h"
 #include "Arbre.h"
 #include "Robot/Robot.h"
-
+#include "Robot/RobotPlanteur.h"
+#include "Robot/RobotArroseur.h"
+#include "Robot/RobotRecolteur.h"
 // constructor
 Environment::Environment(int width, int height)  {
     this->size[0] = width;
@@ -54,15 +56,11 @@ void Environment::printMap() {
     }
 }
 
-void Environment::genereArbre(int pourcentage){
+std::mt19937::result_type genereteSeed(){
     /*
-     * Permet de générer des arbres sur la map
-     * en fonction de la taille de la map et du pourcentage d'arbre voulu
-     * :param pourcentage: pourcentage d'arbre voulu
-    */
-
-    // Determine le nombre d'abre à metter en fonction de la taille de la carte
-    int nbArbre = (this->size[0] * this->size[1]) / pourcentage;
+     * Permet de générer un seed aléatoire
+     * :return: un seed aléatoire
+     */
 
     // génération de random
     std::random_device rd;
@@ -76,10 +74,21 @@ void Environment::genereArbre(int pourcentage){
                             std::chrono::high_resolution_clock::now().time_since_epoch()
                     ).count() );
 
-    std::mt19937 gen(seed);
-    Environment env(5, 5);
+    return seed;
+}
+void Environment::genereArbre(int pourcentage){
+    /*
+     * Permet de générer des arbres sur la map
+     * en fonction de la taille de la map et du pourcentage d'arbre voulu
+     * :param pourcentage: pourcentage d'arbre voulu
+    */
 
-    std::uniform_int_distribution<unsigned> distrib(1, std::max(env.getSize()[0], env.getSize()[1]) - 1);
+    // Determine le nombre d'abre à metter en fonction de la taille de la carte
+    int nbArbre = (this->size[0] * this->size[1]) * pourcentage/100;
+
+    std::mt19937 gen(genereteSeed());
+
+    std::uniform_int_distribution<unsigned> distrib(1, std::max(this->getSize()[0], this->getSize()[1]) - 1);
 
     // On place les arbres aléatoirement sur la map
     for (int i = 0; i < nbArbre; i++) {
@@ -88,7 +97,9 @@ void Environment::genereArbre(int pourcentage){
         int y = distrib(gen);
         // vérifie si la case est vide
         if (this->map[x][y]->getNom() == "_") {// passer cet iteration de boucle
-            this->map[x][y] = new Arbre(x, y, false); // on ajoute l'arbre à la map
+            Arbre *arbre = new Arbre(x, y, false);
+            this->allArbres.push_back(arbre); // on ajoute l'arbre à la liste des arbres
+            this->map[x][y] = arbre; // on ajoute l'arbre à la map
         }
         else {
             i--;
@@ -98,28 +109,17 @@ void Environment::genereArbre(int pourcentage){
 }
 
 void Environment::genereRobot(int nombreRobot){
-    // génération de random
-    std::random_device rd;
-    std::mt19937::result_type seed = rd() ^ (
-            (std::mt19937::result_type)
-                    std::chrono::duration_cast<std::chrono::seconds>(
-                            std::chrono::system_clock::now().time_since_epoch()
-                    ).count() +
-            (std::mt19937::result_type)
-                    std::chrono::duration_cast<std::chrono::microseconds>(
-                            std::chrono::high_resolution_clock::now().time_since_epoch()
-                    ).count() );
+    std::mt19937 gen(genereteSeed());
 
-    std::mt19937 gen(seed);
-    Environment env(5, 5);
-
-    std::uniform_int_distribution<unsigned> distrib(1, std::max(env.getSize()[0], env.getSize()[1]) - 1);
+    std::uniform_int_distribution<unsigned> distrib(1, std::max(this->getSize()[0], this->getSize()[1]) - 1);
     for (int i = 0; i < nombreRobot; i++) {
         int x = distrib(gen);
         int y = distrib(gen);
         // vérifie si la case est vide
         if(this->map[x][y]->getNom() == "_"){
-            this->map[x][y] = new Robot(x, y); // on ajoute l'arbre à la map
+            Robot *robot = new Robot(x, y);
+            this->allRobots.push_back(robot); // on ajoute l'arbre à la liste des arbres
+            this->map[x][y] = robot; // on ajoute l'arbre à la map
         }// passer cet iteration de boucle
         else{
             i--;
@@ -139,7 +139,6 @@ void Environment::initMap(int pourcentageArbre, int nombreRobot) {
         }
     }
 
-    // TODO : il y a un problème avec le random la dernière ligne et la dernière colone en 7x7 ne sont jamais rempli
     // on ajoute des arbres aléatoirement
     genereArbre(pourcentageArbre);
 
@@ -157,7 +156,7 @@ void Environment::updateMap() {
      */
 
     // Avant chaque update on prends 1000 ms de pause
-    sleep(1);
+    sleep(1); // TODO : Doit être supprimer pour la version finale
 
     // Permet au arbre de grandir
     for(auto item:this->allArbres){
@@ -170,13 +169,94 @@ void Environment::updateMap() {
     for(auto item:this->allRobots){
         // cast pour avoir sa class
         Robot* robot = dynamic_cast<Robot *>(item); // Permet de travailler avec le classe arbre
-        robot->action(*this);
+        robot->Update(*this); // Permet d'actualiser les données du robot
+        robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
+        robot->action(*this); // Permet d'agir en fonction de sa décision
     }
-
 }
 
+void Environment::runSimulation() {
+    /*
+     * Permet de lancer la simulation
+     */
+    while (this->running) {
+        // on met à jour la map
+        this->updateMap();
+        // on affiche la map
+        this->printMap();
+    }
+}
 
+void Environment::genereRobotArroseur(int nombreRobot) {
+    /*
+     * Permet de générer des robots arroseurs sur la map
+     */
+    std::mt19937 gen(genereteSeed()); // génération de random
+    std::uniform_int_distribution<unsigned> distrib(1, std::max(this->getSize()[0], this->getSize()[1]) - 1); // distribution aléatoire
 
+    // on ajoute les robots arroseurs
+    for(int i=0;i<nombreRobot;i++){
+        int x = distrib(gen);
+        int y = distrib(gen);
+        // vérifie si la case est vide
+        if(this->map[x][y]->getNom() == "_"){
+            RobotArroseur *robot = new RobotArroseur(x, y);
+            this->allRobots.push_back(robot); // on ajoute l'arbre à la liste des arbres
+            this->map[x][y] = robot; // on ajoute l'arbre à la map
+        }// passer cet iteration de boucle
+        else{
+            i--;
+        }
+    }
+}
+
+void Environment::genereRobotPlanteur(int nombreRobot) {
+    /*
+     * Permet de générer des robots planteurs sur la map
+     * :param nombreRobot: nombre de robot à générer
+     */
+    std::mt19937 gen(genereteSeed()); // génération de random
+    std::uniform_int_distribution<unsigned> distrib(1, std::max(this->getSize()[0], this->getSize()[1]) - 1); // distribution aléatoire
+
+    // on ajoute les robots planteurs
+    for(int i=0;i<nombreRobot;i++){
+        int x = distrib(gen);
+        int y = distrib(gen);
+        // vérifie si la case est vide
+        if(this->map[x][y]->getNom() == "_"){
+            RobotPlanteur *robot = new RobotPlanteur(x, y);
+            this->allRobots.push_back(robot); // on ajoute l'arbre à la liste des arbres
+            this->map[x][y] = robot; // on ajoute l'arbre à la map
+        }// passer cet iteration de boucle
+        else{
+            i--;
+        }
+    }
+}
+
+void Environment::genereRobotRecolteur(int nombreRobot) {
+    /*
+     * Permet de générer des robots récolteurs sur la map
+     * :param nombreRobot: nombre de robot à générer
+     */
+    std::mt19937 gen(genereteSeed()); // génération de random
+    std::uniform_int_distribution<unsigned> distrib(1, std::max(this->getSize()[0], this->getSize()[1]) - 1); // distribution aléatoire
+
+    // on ajoute les robots récolteurs
+    for(int i=0;i<nombreRobot;i++){
+        int x = distrib(gen);
+        int y = distrib(gen);
+        // vérifie si la case est vide
+        if(this->map[x][y]->getNom() == "_"){
+            RobotRecolteur *robot = new RobotRecolteur(x, y);
+            this->allRobots.push_back(robot); // on ajoute l'arbre à la liste des arbres
+            this->map[x][y] = robot; // on ajoute l'arbre à la map
+        }// passer cet iteration de boucle
+        else{
+            i--;
+        }
+    }
+}
 /*
 void Environment::arroser(Robot *robot) {
     // on récupère la position du robot

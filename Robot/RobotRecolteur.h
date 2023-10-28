@@ -5,10 +5,16 @@
 #ifndef COURSGITETC_ROBOTRECOLTEUR_H
 #define COURSGITETC_ROBOTRECOLTEUR_H
 
-
-class RobotRecolteur {
+#include "Robot.h"
+class RobotRecolteur : public Robot {
 public:
+    // constructor
     RobotRecolteur(int x, int y);
+
+    // destructor
+    ~RobotRecolteur();
+
+    // methods
     void recolter();
 };
 

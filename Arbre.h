@@ -34,8 +34,8 @@ public:
     void setIsWatered(bool isWatered);
     // Methods
     void arroser();
+    bool recolter();
     void grandir();
-
 };
 
 

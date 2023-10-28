@@ -13,4 +13,8 @@ add_executable(CoursC main.cpp
         Arbre.cpp
         Arbre.h
         Entite.cpp
-        Entite.h)
+        Entite.h
+        Robot/RobotPlanteur.h
+        Robot/RobotPlanteur.cpp
+        Robot/RobotRecolteur.cpp
+        Robot/RobotArroseur.cpp)
