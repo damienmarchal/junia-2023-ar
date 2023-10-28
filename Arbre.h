@@ -30,8 +30,8 @@ public:
     Etat getStatutArbre();
 
     // Setters
-    Etat setStatutArbre(Etat statutArbre);
-
+    void setStatutArbre(Etat statutArbre);
+    void setIsWatered(bool isWatered);
     // Methods
     void arroser();
     void grandir();
