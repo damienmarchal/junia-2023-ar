@@ -61,6 +61,15 @@ void Robot::move(Direction direction) {
     }
 }
 
+void Robot::scan(Environment &env, int range) {
+    /*
+     * Permet de scanner l'environnement
+     * @param env: environnement à scanner
+     * @param range: rayon de vision du robot (en nombre de cases) (carré de neuf cases)
+     */
+    this->localMap = this->getScannerData(env, range);
+
+}
 std::vector<std::vector<Entite*>> Robot::getScannerData(Environment &env, int range) {
     /*
      * Permet de regarder autour du robot dans un rayon donné
@@ -90,7 +99,11 @@ std::vector<std::vector<Entite*>> Robot::getScannerData(Environment &env, int ra
             for (int i = 0; i < 5; ++i) {
                 data.push_back(std::vector<Entite *>());
                 for (int j = 0; j < 5; ++j) {
-                    data.at(i).push_back(map[x-2+i][y-2+j]);
+                    if(x-2+1<0||y-2+j<0){ // Si on est sur les bords de la carte
+                        data.at(i).push_back(new Entite(x-2+i,y-2+j));
+                    }
+                    else // Si on est dans la carte
+                    data.at(i).push_back(map[x-2+i][y-2+j]); // On ajoute la case à la carte
                 }
             }
             break;
@@ -98,9 +111,9 @@ std::vector<std::vector<Entite*>> Robot::getScannerData(Environment &env, int ra
             std::cout << "Erreur: range invalide" << std::endl;
             break;
     }
-
     return data;
 }
+
 
 void Robot::action(Environment &env) {
     /*
@@ -168,6 +181,28 @@ bool Robot::isFree() {
             return this->getLocalMap()[this->getPosition()[0]][this->getPosition()[1] - 1]->getNom() == "_";
     }
     return false;
+}
+
+
+void Robot::cinematicMove() {
+    // TODO : faire bouger le robot en se basant sur la cinématique inverse
+    /*
+     * Permet de faire bouger le robot en se basant sur la cinématique inverse
+     */
+
+    // on récupère la position du robot
+    int x = this->getPosition()[0];
+    int y = this->getPosition()[1];
+
+    // on récupère la position désirée du robot
+    int xD = this->getDesiredPose()[0];
+    int yD = this->getDesiredPose()[1];
+
+    // on récupère l'orientation du robot
+    float orientation = this->getOrientation();
+
+
+
 }
 
 

@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <random>
 
 #include "Entite.h"
 
@@ -50,6 +52,9 @@ public:
     void genereRobotPlanteur(int nombreRobot);
     void genereRobotArroseur(int nombreRobot);
     void genereRobotRecolteur(int nombreRobot);
+
+    // General Function
+    static std::mt19937::result_type genereteSeed();
 };
 
 

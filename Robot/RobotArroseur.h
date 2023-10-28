@@ -11,8 +11,9 @@ class RobotArroseur : public Robot{
 public:
     RobotArroseur(int x, int y) ;
     void arroser();
-    void priseDecision(Environment &env);
-    void action();
+
+    void priseDecision(Environment &env) override;
+    void action(Environment &env) override;
 };
 
 

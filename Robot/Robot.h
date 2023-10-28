@@ -22,6 +22,7 @@ public:
     float battery, batteryMax; // niveau de batterie
     float capacity, capacityMax ; // capacité de stockage
     float speed, speedMax; // vitesse de déplacement
+    float speedWeelRight, speedWeelLeft; // vitesse des roues
     std::vector<std::vector<Entite*>> localMap; // carte locale du robot
     float diseriedPose[3]; // pose désirée du robot (x,y,orientation)
 
@@ -53,12 +54,14 @@ public:
 
     // Methods
     void move(Direction direction);
+    void cinematicMove();
     void turn();
     std::vector<std::vector<Entite*>> getScannerData(Environment &env, int range);
     virtual void action(Environment &env);
     virtual void priseDecision(Environment &env);
     void Update(Environment &env);
     bool isFree();
+    void scan(Environment &env, int range);
 };
 
 

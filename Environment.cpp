@@ -56,7 +56,7 @@ void Environment::printMap() {
     }
 }
 
-std::mt19937::result_type genereteSeed(){
+std::mt19937::result_type Environment::genereteSeed(){
     /*
      * Permet de générer un seed aléatoire
      * :return: un seed aléatoire
