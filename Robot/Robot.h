@@ -14,7 +14,7 @@
 class Robot : public Entite {
 public:
 // Attributs
-    enum class ActualManeuver { Mouvement, SpecialAction, Idle };
+    enum class ActualManeuver { Mouvement,Turn, SpecialAction, Idle };
     ActualManeuver actualManeuver;
     enum class Direction { Nord,Est,Sud,Ouest };
     Direction direction;
@@ -42,9 +42,13 @@ public:
     ActualManeuver getActualManeuver();
     Direction getDirection();
     std::vector<std::vector<Entite*>> getLocalMap();
+    float getSpeedWeelRight();
+    float getSpeedWeelLeft();
 
 
     // Setters
+    void setSpeedWeelRight(float speedWeelRight);
+    void setSpeedWeelLeft(float speedWeelLeft);
     void setDesiredPose(float x, float y, float orientation);
     void setOrientation(float orientation);
     virtual void setBattery(float battery);
@@ -54,14 +58,22 @@ public:
 
     // Methods
     void move(Direction direction);
+    void move(float speed);
+    void move();
     void cinematicMove();
     void turn();
+    void turn(float angle);
     std::vector<std::vector<Entite*>> getScannerData(Environment &env, int range);
     virtual void action(Environment &env);
     virtual void priseDecision(Environment &env);
     void Update(Environment &env);
     bool isFree();
     void scan(Environment &env, int range);
+    float distanceEntreRobotEtObjet( float xObjet, float yObjet);
+
+    // static methods
+    static float angle(float x1, float y1, float x2, float y2);
+    static float angleRobotArbre(float xRobot, float yRobot, float xArbre, float yArbre, float orientationRobot);
 };
 
 
