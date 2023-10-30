@@ -9,6 +9,7 @@
 
 class RobotArroseur : public Robot{
 public:
+    // constructor
     RobotArroseur(int x, int y) ;
     void arroser();
 

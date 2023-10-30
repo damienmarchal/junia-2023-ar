@@ -38,7 +38,7 @@ public:
     void setRunning(bool running);
 
     // methods
-    void initMap(int pourcentageArbre,int nombreRobot);
+    void initMap(int pourcentageArbre, int nombreRobotArroseur, int nombreRobotPlanteur, int nombreRobotRecolteur);
     void printMap();
     void updateMap();
     void runSimulation();
@@ -48,7 +48,7 @@ public:
     //void arroser(Robot* robot); // arrose les cases autour du robot
 
     void genereArbre(int pourcentage);
-    void genereRobot(int nombreRobot);
+    void genereRobot(int nombreRobotArroseur, int nombreRobotPlanteur, int nombreRobotRecolteur);
     void genereRobotPlanteur(int nombreRobot);
     void genereRobotArroseur(int nombreRobot);
     void genereRobotRecolteur(int nombreRobot);

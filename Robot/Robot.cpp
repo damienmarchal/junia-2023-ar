@@ -32,6 +32,7 @@ Robot::Direction Robot::getDirection() { return this->direction; }
 Robot::ActualManeuver Robot::getActualManeuver() { return this->actualManeuver; }
 float Robot::getSpeedWeelRight() { return this->speedWeelRight; }
 float Robot::getSpeedWeelLeft() { return this->speedWeelLeft; }
+int *Robot::getPositionObjectifEnLocal() { return this->positionObjectifEnLocal; }
 
 // setters
 void Robot::setActualManeuver(Robot::ActualManeuver actualManeuver) { this->actualManeuver = actualManeuver; }
@@ -45,6 +46,10 @@ void Robot::setDesiredPose(float x, float y, float orientation) {
     this->diseriedPose[0] = x;
     this->diseriedPose[1] = y;
     this->diseriedPose[2] = orientation;
+}
+void Robot::setPositionObjectifEnLocal(int x, int y) {
+    this->positionObjectifEnLocal[0] = x;
+    this->positionObjectifEnLocal[1] = y;
 }
 
 // methods
@@ -287,3 +292,5 @@ float Robot::angle(float x1, float y1, float x2, float y2) {
      */
     return atan2(y2-y1,x2-x1)*180/M_PI;
 }
+
+

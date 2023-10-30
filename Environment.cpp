@@ -108,16 +108,49 @@ void Environment::genereArbre(int pourcentage){
 
 }
 
-void Environment::genereRobot(int nombreRobot){
-    std::mt19937 gen(genereteSeed());
+void Environment::genereRobot(int nombreRobotArroseur, int nombreRobotPlanteur, int nombreRobotRecolteur){
+    /*
+     * Permet de générer des robots sur la map
+     * :param nombreRobotArroseur: nombre de robot arroseur à générer
+     * :param nombreRobotPlanteur: nombre de robot planteur à générer
+     * :param nombreRobotRecolteur: nombre de robot récolteur à générer
+     */
+    // TODO : Trouver un moyen de simplifer les trois boucles for en une seule
 
+    std::mt19937 gen(genereteSeed());
     std::uniform_int_distribution<unsigned> distrib(1, std::max(this->getSize()[0], this->getSize()[1]) - 1);
-    for (int i = 0; i < nombreRobot; i++) {
+    for (int i = 0; i < nombreRobotArroseur; i++) {
         int x = distrib(gen);
         int y = distrib(gen);
         // vérifie si la case est vide
         if(this->map[x][y]->getNom() == "_"){
-            Robot *robot = new Robot(x, y);
+            RobotArroseur *robot = new RobotArroseur(x, y);
+            this->allRobots.push_back(robot); // on ajoute l'arbre à la liste des arbres
+            this->map[x][y] = robot; // on ajoute l'arbre à la map
+        }// passer cet iteration de boucle
+        else{
+            i--;
+        }
+    }
+    for(int i=0;i<nombreRobotRecolteur;i++){
+        int x = distrib(gen);
+        int y = distrib(gen);
+        // vérifie si la case est vide
+        if(this->map[x][y]->getNom() == "_"){
+            RobotRecolteur *robot = new RobotRecolteur(x, y);
+            this->allRobots.push_back(robot); // on ajoute l'arbre à la liste des arbres
+            this->map[x][y] = robot; // on ajoute l'arbre à la map
+        }// passer cet iteration de boucle
+        else{
+            i--;
+        }
+    }
+    for(int i=0;i<nombreRobotPlanteur;i++){
+        int x = distrib(gen);
+        int y = distrib(gen);
+        // vérifie si la case est vide
+        if(this->map[x][y]->getNom() == "_"){
+            RobotPlanteur *robot = new RobotPlanteur(x, y);
             this->allRobots.push_back(robot); // on ajoute l'arbre à la liste des arbres
             this->map[x][y] = robot; // on ajoute l'arbre à la map
         }// passer cet iteration de boucle
@@ -127,7 +160,7 @@ void Environment::genereRobot(int nombreRobot){
     }
 }
 
-void Environment::initMap(int pourcentageArbre, int nombreRobot) {
+void Environment::initMap(int pourcentageArbre, int nombreRobotArroseur, int nombreRobotPlanteur, int nombreRobotRecolteur) {
     /* Permet d'ajouter des obstacles à la map */
 
     // on ajoute des murs sur les bords
@@ -143,7 +176,7 @@ void Environment::initMap(int pourcentageArbre, int nombreRobot) {
     genereArbre(pourcentageArbre);
 
     // on ajoute des robots aléatoirement
-    genereRobot(nombreRobot);
+    genereRobot(nombreRobotArroseur, nombreRobotPlanteur, nombreRobotRecolteur);
 
     // on lance la simulation
     this->running = true;
@@ -167,11 +200,30 @@ void Environment::updateMap() {
 
     // Demande à chaque robot l'action qu'il veut faire
     for(auto item:this->allRobots){
-        // cast pour avoir sa class
-        Robot* robot = dynamic_cast<Robot *>(item); // Permet de travailler avec le classe arbre
-        robot->Update(*this); // Permet d'actualiser les données du robot
-        robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
-        robot->action(*this); // Permet d'agir en fonction de sa décision
+        // on regarde comment cast le robot
+        // TODO : faire une template pour éviter la répétition de code
+        if(item->getNom()=="R"){
+            // cast pour avoir sa class
+            RobotRecolteur* robot = dynamic_cast<RobotRecolteur *>(item); // Permet de travailler avec le classe arbre
+            robot->Update(*this); // Permet d'actualiser les données du robot
+            robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
+            robot->action(*this); // Permet d'agir en fonction de sa décision
+        }
+        else if(item->getNom()=="W"){
+            // cast pour avoir sa class
+            RobotArroseur* robot = dynamic_cast<RobotArroseur *>(item); // Permet de travailler avec le classe arbre
+            robot->Update(*this); // Permet d'actualiser les données du robot
+            robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
+            robot->action(*this); // Permet d'agir en fonction de sa décision
+        }
+        else if(item->getNom()=="P"){
+            RobotPlanteur* robot = dynamic_cast<RobotPlanteur *>(item); // Permet de travailler avec le classe arbre
+            robot->Update(*this); // Permet d'actualiser les données du robot
+            robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
+            robot->action(*this); // Permet d'agir en fonction de sa décision
+        }
+
+
     }
 }
 
@@ -179,7 +231,7 @@ void Environment::runSimulation() {
     /*
      * Permet de lancer la simulation
      */
-    while (this->running) {
+    while (this->getRunning()) {
         // on met à jour la map
         this->updateMap();
         // on affiche la map

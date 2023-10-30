@@ -8,7 +8,8 @@
 RobotArroseur::RobotArroseur(int x, int y) : Robot(x, y) {
     this->position[0] = x;
     this->position[1] = y;
-    this->nom = "A";
+    this->nom = "W"; // W pour Water car A est déjà pris par Arbre
+    this->capacity = 10;
 }
 
 void RobotArroseur::arroser() {
@@ -16,10 +17,14 @@ void RobotArroseur::arroser() {
      * Permet d'arroser l'arbre sur lequel le robot est
      */
     // Vérifie si l'on a assez d'eau pour arroser
-    if(this->getCapacity() <= 0)
+    if(this->getCapacity() <= 0){
+        std::cout << "Le robot n'a plus d'eau" << std::endl;
         return;
+    }
+
     // Récupère l'arbre sur lequel le robot est
-    Arbre *arbre = (Arbre *) this->getLocalMap()[this->getPosition()[0]][this->getPosition()[1]];
+    std::cout << "Le robot arrose l'arbre en position : (" <<this->getPositionObjectifEnLocal()[0]<<";"<<this->getPositionObjectifEnLocal()[1]<<")"<< std::endl;
+    Arbre *arbre = (Arbre *) this->getLocalMap()[this->getPositionObjectifEnLocal()[0]][this->getPositionObjectifEnLocal()[1]];
     arbre->arroser(); // On arrose l'arbre
     this->setCapacity(this->getCapacity() - 1); // On enlève de l'eau au robot
     this->setActualManeuver(Robot::ActualManeuver::Idle); // On met le robot en mode Idle
@@ -38,46 +43,48 @@ void RobotArroseur::priseDecision(Environment &env) {
     }
     else if(this->getActualManeuver() == Robot::ActualManeuver::Idle){ // aucune direction n'est définie
         // Scanner l'environnement pour vérifier s'il y a un arbre à arroser
-        for(int x=0;x<getLocalMap().size()-1;x++){
-            for(int y=0;y<getLocalMap()[x].size()-1;y++){
-                if(getLocalMap()[x][y]->getNom() == "A"){ // Si c'est un arbre
+        for(int x=0;x<getLocalMap().size();x++) {
+            for (int y = 0; y < getLocalMap()[x].size() ; y++) {
+                if (getLocalMap()[x][y]->getNom() == "A") { // Si c'est un arbre
                     Arbre *arbre = (Arbre *) getLocalMap()[x][y];
-                    if(!arbre->getIsWatered()){ // Si l'arbre n'est pas encore arrosé
-                        this->setDesiredPose((float)x,(float)y,0);
+                    if (!arbre->getIsWatered()) { // Si l'arbre n'est pas encore arrosé
+                        this->setDesiredPose((float) x, (float) y, 0);
+                        this->setPositionObjectifEnLocal(x, y);
                         this->setActualManeuver(Robot::ActualManeuver::Mouvement);
-                        return;
-                    }
-                }else { // Aucun arbre a arrosé n'a été trouvé
-                    // Scanner l'environnement pour vérifier s'il y a un arbre à arroser avec un plus grand rayon
-                    if (this->getLocalMap().size() < 5) {
-                        this->scan(env, 2);
-                        this->action(env);
-                    } else {
-                        // Si on a déjà scanné avec un rayon de 5 et qu'on a rien trouvé
-                        // On vérifie si on a un arbre à arroser avec un rayon de 1
-                        for (int x = 0; x < getLocalMap().size() - 1; x++) {
-                            for (int y = 0; y < getLocalMap()[x].size() - 1; y++) {
-                                if (getLocalMap()[x][y]->getNom() == "A") { // Si c'est un arbre
-                                    // dit au robot de se déplacer jusqu'à l'arbre
-                                    this->setDesiredPose((float) x, (float) y, 0);
-                                    this->setActualManeuver(Robot::ActualManeuver::Mouvement);
-                                    return;
-                                }
-                            }
-                        }
-                        // On a pas du tout trouvé d'arbre
-                        // donc on se déplace aléatoirement
-                        this->setActualManeuver(Robot::ActualManeuver::Mouvement);
-                        std::mt19937 gen(Environment::genereteSeed());
-                        std::uniform_int_distribution<unsigned> distrib(1,
-                                                                        std::max(env.getSize()[0], env.getSize()[1]) -
-                                                                        1);
-                        this->setDesiredPose(distrib(gen), distrib(gen), 0);
                         return;
                     }
                 }
-
             }
+        }
+        // Aucun arbre a arrosé n'a été trouvé
+        // Scanner l'environnement pour vérifier s'il y a un arbre à arroser avec un plus grand rayon
+        if (this->getLocalMap().size() < 5) {
+            this->scan(env, 2);
+            this->priseDecision(env);
+        }
+        else {
+            // Si on a déjà scanné avec un rayon de 5 et qu'on a rien trouvé
+            // On vérifie si on a un arbre à arroser avec un rayon de 1
+            for (int x = 0; x < getLocalMap().size() - 1; x++) {
+                for (int y = 0; y < getLocalMap()[x].size() - 1; y++) {
+                    if (getLocalMap()[x][y]->getNom() == "A") { // Si c'est un arbre
+                        // dit au robot de se déplacer jusqu'à l'arbre
+                        this->setDesiredPose((float) x+this->getPosition()[0],(float) y+this->getPosition()[1], 0);
+                        this->setPositionObjectifEnLocal(x, y);
+                        this->setActualManeuver(Robot::ActualManeuver::Mouvement);
+                        return;
+                    }
+                }
+            }
+            // On a pas du tout trouvé d'arbre
+            // donc on se déplace aléatoirement
+            this->setActualManeuver(Robot::ActualManeuver::Mouvement);
+            std::mt19937 gen(Environment::genereteSeed());
+            std::uniform_int_distribution<unsigned> distrib(1,
+                                                            std::max(env.getSize()[0], env.getSize()[1]) -
+                                                            1);
+            this->setDesiredPose(distrib(gen), distrib(gen), 0);
+            return;
         }
     }
 }

@@ -7,7 +7,7 @@
 
 int main() {
     Environment env(6, 6);
-    env.initMap(20,2);
+    env.initMap(10,1,0,0);
     env.printMap();
 
     env.runSimulation(); // Lance la simulation

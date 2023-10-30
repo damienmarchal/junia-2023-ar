@@ -25,6 +25,7 @@ public:
     float speedWeelRight, speedWeelLeft; // vitesse des roues
     std::vector<std::vector<Entite*>> localMap; // carte locale du robot
     float diseriedPose[3]; // pose désirée du robot (x,y,orientation)
+    int positionObjectifEnLocal[2]; // Position de l'objectif a atteindre mais dans le repère local
 
 
     // constructeur
@@ -44,6 +45,7 @@ public:
     std::vector<std::vector<Entite*>> getLocalMap();
     float getSpeedWeelRight();
     float getSpeedWeelLeft();
+    int* getPositionObjectifEnLocal();
 
 
     // Setters
@@ -55,6 +57,7 @@ public:
     virtual void setCapacity(float capacity);
     virtual void setSpeed(float speed);
     void setActualManeuver(ActualManeuver actualManeuver);
+    void setPositionObjectifEnLocal(int x, int y);
 
     // Methods
     void move(Direction direction);
