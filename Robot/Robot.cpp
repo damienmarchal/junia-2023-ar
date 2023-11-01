@@ -22,7 +22,7 @@ Robot::Robot(int x, int y) : Entite(x, y) {
 Robot::~Robot() = default;
 
 // getters
-float *Robot::getDesiredPose() { return new float[3]{static_cast<float>(this->getPosition()[0]), static_cast<float>(this->getPosition()[1]), this->getOrientation()}; }
+float *Robot::getDesiredPose() { return new float[3]{static_cast<float>(this->diseriedPose[0]), static_cast<float>(this->diseriedPose[1]), this->diseriedPose[2]}; }
 float Robot::getOrientation() { return this->orientation; }
 float Robot::getBattery() { return this->battery; }
 float Robot::getCapacity() { return this->capacity; }
@@ -122,7 +122,7 @@ std::vector<std::vector<Entite*>> Robot::getScannerData(Environment &env, int ra
             for (int i = 0; i < 5; ++i) {
                 data.push_back(std::vector<Entite *>());
                 for (int j = 0; j < 5; ++j) {
-                    if(x-2+1<0||y-2+j<0){ // Si on est sur les bords de la carte
+                    if(x-2+1<0||y-2+j<0||x+2+i>map.size()||y+2+j>map.size()){ // Si on est hors map
                         data.at(i).push_back(new Entite(x-2+i,y-2+j));
                     }
                     else // Si on est dans la carte
@@ -253,7 +253,17 @@ void Robot::cinematicMove() {
     float yD = this->getDesiredPose()[1];
 
     float margin = 0.1; // marge d'erreur pour la pose
-
+    /*
+     * La méthode fonctionne de la manière suivante :
+     * tourne jusqu'a être dans la bonne direction
+     * avance jusqu'a être à la bonne distance
+     */
+    // On vérifie si on est dans la bonne direction
+    if(Robot::angleRobotArbre(x,y,xD,yD,this->getOrientation())>margin&&this->getActualManeuver() == Robot::ActualManeuver::Mouvement)
+        this->setActualManeuver(Robot::ActualManeuver::Turn); // On met le robot en mode Turn
+    else
+        this->setActualManeuver(Robot::ActualManeuver::Mouvement); // On met le robot en mode Mouvement
+    // On applique la bonne vitesse au roue en fonction des cas
     switch (this->getActualManeuver()) {
         case ActualManeuver::Mouvement:
             if(this->distanceEntreRobotEtObjet(xD,yD) < margin) // Si on est sur la pose désirée

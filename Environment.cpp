@@ -186,6 +186,7 @@ void Environment::initMap(int pourcentageArbre, int nombreRobotArroseur, int nom
 void Environment::updateMap() {
     /*
      * Permet de mettre à jour la map
+     * Et de faire en sorte que toutes les entités évoluent dans l'environnement
      */
 
     // Avant chaque update on prends 1000 ms de pause
@@ -212,7 +213,8 @@ void Environment::updateMap() {
         else if(item->getNom()=="W"){
             // cast pour avoir sa class
             RobotArroseur* robot = dynamic_cast<RobotArroseur *>(item); // Permet de travailler avec le classe arbre
-            robot->Update(*this); // Permet d'actualiser les données du robot
+            if(robot->getActualManeuver()==Robot::ActualManeuver::Idle)
+                robot->Update(*this); // Permet d'actualiser les données du robot
             robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
             robot->action(*this); // Permet d'agir en fonction de sa décision
         }
@@ -309,29 +311,3 @@ void Environment::genereRobotRecolteur(int nombreRobot) {
         }
     }
 }
-/*
-void Environment::arroser(Robot *robot) {
-    // on récupère la position du robot
-    int x = robot->getPosition()[0];
-    int y = robot->getPosition()[1];
-
-    // on vérifie si la case est un arbre
-    if (this->map[x][y]->getNom() == "A") {
-        // on cast la case en arbre
-        Arbre *arbre = dynamic_cast<Arbre *>(this->map[x][y]);
-        // on arrose l'arbre
-        if(!arbre->getIsWatered()){
-            arbre->arroser();
-        }
-    }
-}
-*/
-
-
-
-/*
-void Environment::addArbre(Arbre arbre, int x, int y) {
-    // on ajoute l'arbre à la map
-    this->map[x][y] = &arbre;
-}
-*/

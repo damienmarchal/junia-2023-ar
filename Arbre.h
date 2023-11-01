@@ -12,7 +12,7 @@
 class Arbre : public Obstacle{
 public:
     // Enum
-    enum class Etat {planted,growing,mature,fruits,rotten};
+    enum class Etat {planted,growing,mature,jeuneFruits,fruits,fruitsMure,fruitsTropMure,rotten};
 
     // Attributes
     Etat statutArbre;

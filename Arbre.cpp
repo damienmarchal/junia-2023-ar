@@ -44,7 +44,7 @@ void Arbre::grandir() {
     if(this->getIsWatered()){ this->setStatutArbre((Etat) ((int) this->getStatutArbre() + 1));}
 
     // Une fois que l'arbre à donner des fruits, il n'est plus arrosé
-    if(this->getStatutArbre() == Etat::fruits || this->getStatutArbre() == Etat::mature){
+    if(this->getStatutArbre() == Etat::jeuneFruits){
         this->setIsWatered(false);
     }
 }

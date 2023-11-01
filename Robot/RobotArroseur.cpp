@@ -23,7 +23,7 @@ void RobotArroseur::arroser() {
     }
 
     // Récupère l'arbre sur lequel le robot est
-    std::cout << "Le robot arrose l'arbre en position : (" <<this->getPositionObjectifEnLocal()[0]<<";"<<this->getPositionObjectifEnLocal()[1]<<")"<< std::endl;
+    std::cout << "Le robot arrose l'arbre en position : (" <<this->getDesiredPose()[0]<<";"<<this->getDesiredPose()[1]<<")"<< std::endl;
     Arbre *arbre = (Arbre *) this->getLocalMap()[this->getPositionObjectifEnLocal()[0]][this->getPositionObjectifEnLocal()[1]];
     arbre->arroser(); // On arrose l'arbre
     this->setCapacity(this->getCapacity() - 1); // On enlève de l'eau au robot
@@ -48,7 +48,7 @@ void RobotArroseur::priseDecision(Environment &env) {
                 if (getLocalMap()[x][y]->getNom() == "A") { // Si c'est un arbre
                     Arbre *arbre = (Arbre *) getLocalMap()[x][y];
                     if (!arbre->getIsWatered()) { // Si l'arbre n'est pas encore arrosé
-                        this->setDesiredPose((float) x, (float) y, 0);
+                        this->setDesiredPose((float) arbre->getPosition()[0],(float) arbre->getPosition()[1], 0);
                         this->setPositionObjectifEnLocal(x, y);
                         this->setActualManeuver(Robot::ActualManeuver::Mouvement);
                         return;
@@ -56,22 +56,21 @@ void RobotArroseur::priseDecision(Environment &env) {
                 }
             }
         }
+        goto noTreeToWater; // On saute le code suivant // TODO : juste pour le debug à enlever
         // Aucun arbre a arrosé n'a été trouvé
         // Scanner l'environnement pour vérifier s'il y a un arbre à arroser avec un plus grand rayon
-        if (this->getLocalMap().size() < 5) {
-            this->scan(env, 2);
+        /*if (this->getLocalMap().size() < 5) {
+            this->scan(env, 2); // On scan avec un rayon de 2 (avant on était à 1)
             this->priseDecision(env);
         }
-        else {
+        else {*/noTreeToWater:
             // Si on a déjà scanné avec un rayon de 5 et qu'on a rien trouvé
             // On vérifie si on a un arbre à arroser avec un rayon de 1
-            for (int x = 0; x < getLocalMap().size() - 1; x++) {
-                for (int y = 0; y < getLocalMap()[x].size() - 1; y++) {
+            this->scan(env, 1); // On repart sur un scan de rayon 1
+            for (int x = 0; x < getLocalMap().size() ; x++) {
+                for (int y = 0; y < getLocalMap()[x].size() ; y++) {
                     if (getLocalMap()[x][y]->getNom() == "A") { // Si c'est un arbre
-                        // dit au robot de se déplacer jusqu'à l'arbre
-                        this->setDesiredPose((float) x+this->getPosition()[0],(float) y+this->getPosition()[1], 0);
-                        this->setPositionObjectifEnLocal(x, y);
-                        this->setActualManeuver(Robot::ActualManeuver::Mouvement);
+                        this->setActualManeuver(Robot::ActualManeuver::Idle); // Ne bouge pas
                         return;
                     }
                 }
@@ -85,7 +84,7 @@ void RobotArroseur::priseDecision(Environment &env) {
                                                             1);
             this->setDesiredPose(distrib(gen), distrib(gen), 0);
             return;
-        }
+        //}
     }
 }
 
@@ -98,11 +97,15 @@ void RobotArroseur::action(Environment &env) {
 
     // Vérifie s'il y a déjà une pose disérer à atteindre
     if(this->getActualManeuver() == Robot::ActualManeuver::Mouvement) { // une direction est déjà définie
-        float margin = 0.1; // marge d'erreur pour la pose
-        if(this->getDesiredPose()[0] - margin <= this->getPosition()[0] && this->getPosition()[0] <= this->getDesiredPose()[0] + margin &&
-           this->getDesiredPose()[1] - margin <= this->getPosition()[1] && this->getPosition()[1] <= this->getDesiredPose()[1] + margin)
+        float margin = 1.1; // marge d'erreur pour la pose
+        float xd = this->getDesiredPose()[0];
+        float yd = this->getDesiredPose()[1];
+        auto x = (float)this->getPosition()[0];
+        auto y = (float)this->getPosition()[1];
+        if(xd - margin <= x && x <= xd + margin && yd - margin <= y && y <= yd + margin) {
             // Si on est sur la pose désirée
             this->setActualManeuver(Robot::ActualManeuver::SpecialAction); // On met le robot en mode arrosage
+        }
         else
         // On se déplace jusqu'à la pose désirée
             this->cinematicMove();

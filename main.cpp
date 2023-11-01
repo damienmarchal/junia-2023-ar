@@ -6,7 +6,7 @@
 
 
 int main() {
-    Environment env(6, 6);
+    Environment env(7, 7);
     env.initMap(10,1,0,0);
     env.printMap();
 
