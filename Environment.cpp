@@ -18,7 +18,16 @@
      pos.push_back(pos_x+v*cos(pos_w)*temps);
      pos.push_back(pos_y+v*sin(pos_w)*temps);
      pos.push_back(pos_w+w*temps);
-     return pos;
+     if (pos[0] <= this->size_x && pos[1] <= this->size_y && this->map_etat[(int)pos[1]][(int)pos[0]] == Etat::libre) {
+         return pos;
+     }
+     else {
+         pos[0] = pos_x;
+         pos[1] = pos_y;
+         pos[2] = pos_w;
+         return pos;
+         std::cout << "déplacement impossible" << std::endl;
+     }
  }
 
 
