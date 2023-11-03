@@ -30,7 +30,14 @@
     
 
     void Robot::set_wheel_speed(Environment& map, double left_speed, double right_speed) {
-        map.Deplacement(this->pos_x, this->pos_y, this->pos_w, left_speed, right_speed, 0.1);
+        std::vector<double> point = map.Deplacement(this->pos_x, this->pos_y, this->pos_w, left_speed, right_speed, 0.1);
+        map.map_etat[this->case_y][this->case_x] = Etat::libre;
+        this->pos_x = point[0];
+        this->pos_y = point[1];
+        this->pos_w = point[2];
+        this->case_x = (int) point[0];
+        this->case_y = (int)point[1];
+        map.map_etat[this->case_y][this->case_x] = Etat::robot;
 
     }
 
