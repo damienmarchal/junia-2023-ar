@@ -4,10 +4,12 @@
 #include <iostream>
 #include <vector>
 
-class RobotArroseur :Robot {
+class RobotArroseur :public Robot {
 public:
 	int VolumeEau;
-	RobotArroseur(int id, Environment& map, int pos_x, int pos_y, int VolumeEau);
+	int VolumeMax;
+	RobotArroseur(int id, Environment& map, int case_x, int case_y, int VolumeEau);
 	void arroser();
 	int get_VolumeEau();
+	void remplirEau(int volumeEau);
 };

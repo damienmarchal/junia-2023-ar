@@ -3,8 +3,8 @@
 #include "Environment.h"
 #include <iostream>
 #include <vector>
-class RobotPlanteur :Robot {
+class RobotPlanteur :public Robot {
 public:
-	RobotPlanteur(int id, Environment& map, int pos_x, int pos_y);
+	RobotPlanteur(int id, Environment& map, int case_x, int case_y);
 	void planter(Environment& map);
 };

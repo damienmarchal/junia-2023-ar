@@ -7,17 +7,22 @@
 class Robot {
 public:
     int id;
-    int pos_x;
-    int pos_y;
+    double pos_x;
+    double pos_y;
+    double pos_w;
+    int case_x;
+    int case_y;
 
-    Robot(int id, Environment& map, int pos_x, int pos_y);
+    Robot(int id, Environment& map, int case_x, int case_y);
 
     int get_id();
-    int get_pos_x();
-    int get_pos_y();
+    double get_pos_x();
+    double get_pos_y();
+    int get_case_x();
+    int get_case_y();
 
 
-    void deplacer(Environment& map, int dir);
+    void set_wheel_speed(Environment& map, double left_speed, double right_speed);
 
 };
 
