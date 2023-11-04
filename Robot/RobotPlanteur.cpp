@@ -24,65 +24,11 @@ void RobotPlanteur::planter(Environment &env) {
     }
     else {
         // TODO : vérifier qu'une zone de plantation est disponible
-        if (this->isFree()) {
-            // Vérifie que toute les cases autour de la zone sont libre
-            // récupère les coordonnées de la zone
-            int x = this->getPosition()[0];
-            int y = this->getPosition()[1];
-            Direction direction = this->getDirection();
-            // Vérifier que la zone est libre en fonction de la direction pour planter l'arbre
-            switch (direction) {
-                case Robot::Direction::Nord:
-                    if (this->localMap[x][y - 1]->getNom() == "_" && this->localMap[x - 1][y - 1]->getNom() == "_" &&
-                        this->localMap[x + 1][y - 1]->getNom() == "_" && this->localMap[x - 1][y]->getNom() == "_" &&
-                        this->localMap[x + 1][y]->getNom() == "_") {
-                        //planter l'arbre
-                        int position[2] = {x, y - 1};
-                        //env.addArbre(Arbre(position[0], position[1]), position[0], position[1]);
-                        //Retirer une graine au robot
-                        this->setCapacity(this->getCapacity() - 1);
-                    } else {
-                        // TODO : si la zone n'est pas libre, le robot va chercher une autre zone
-                        // TODO : Peut-être mettre en place un système de stratégie par fifo
-                    }
-                    break;
-                case Direction::Est:
-                    if (this->localMap[x + 1][y]->getNom() == "_" && this->localMap[x + 1][y - 1]->getNom() == "_" &&
-                        this->localMap[x + 1][y + 1]->getNom() == "_" && this->localMap[x][y - 1]->getNom() == "_" &&
-                        this->localMap[x][y + 1]->getNom() == "_") {
-                        //planter l'arbre
-                        int position[2] = {x + 1, y};
-                        //env.addArbre(Arbre(position[0], position[1]), position[0], position[1]);
-                        //Retirer une graine au robot
-                        this->setCapacity(this->getCapacity() - 1);
-                    }
-                    break;
-                case Direction::Sud:
-                    if (this->localMap[x][y + 1]->getNom() == "_" && this->localMap[x - 1][y + 1]->getNom() == "_" &&
-                        this->localMap[x + 1][y + 1]->getNom() == "_" && this->localMap[x - 1][y]->getNom() == "_" &&
-                        this->localMap[x + 1][y]->getNom() == "_") {
-                        //planter l'arbre
-                        int position[2] = {x, y + 1};
-                        //env.addArbre(Arbre(position[0], position[1]), position[0], position[1]);
-                        //Retirer une graine au robot
-                        this->setCapacity(this->getCapacity() - 1);
-                    }
-                    break;
-                case Direction::Ouest:
-                    if (this->localMap[x - 1][y]->getNom() == "_" && this->localMap[x - 1][y - 1]->getNom() == "_" &&
-                        this->localMap[x - 1][y + 1]->getNom() == "_" && this->localMap[x][y - 1]->getNom() == "_" &&
-                        this->localMap[x][y + 1]->getNom() == "_") {
-                        //planter l'arbre
-                        int position[2] = {x - 1, y};
-                        //env.addArbre(Arbre(position[0], position[1]), position[0], position[1]);
-                        //Retirer une graine au robot
-                        this->setCapacity(this->getCapacity() - 1);
-                    }
-                    break;
-
-            }
-        } else {
-            // TODO : si la zone n'est pas libre, le robot va chercher une autre zone
+        if (this->isFreeZoneToPlant()) {
+            // TODO : planter un arbre
+        }
+        else {
+            // TODO : si la zone de plantation n'est pas disponible, le robot va chercher une zone de plantation
             // TODO : Peut-être mettre en place un système de stratégie par fifo
         }
     }
@@ -96,5 +42,13 @@ void RobotPlanteur::action(Environment &env) {
     this->planter(env);
 
     // TODO : Mettre en place une stratégie de déplacement
+}
+
+bool RobotPlanteur::isFreeZoneToPlant() {
+    /*
+     * Permet de vérifier si la zone de plantation est libre
+     */
+    // TODO : Vérifier que la zone de plantation est libre
+    return true;
 }
 

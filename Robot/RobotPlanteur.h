@@ -12,6 +12,7 @@ public:
     RobotPlanteur(int x, int y);
     void planter(Environment &env);
     void action(Environment &env);
+    bool isFreeZoneToPlant();
 };
 
 

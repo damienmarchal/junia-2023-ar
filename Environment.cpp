@@ -43,6 +43,9 @@ void Environment::setRunning(bool running) { this->running = running; }
 
 // methods
 void Environment::printMap() {
+    /*
+     * Permet d'afficher la map
+     */
     std::cout << std::endl;
     for (int i = 0; i < this->size[0]; i++) {
         for (int j = 0; j < this->size[1]; j++) {
@@ -221,6 +224,7 @@ void Environment::updateMap() {
             robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
             robot->action(*this); // Permet d'agir en fonction de sa décision
         }
+
     }
 }
 
@@ -307,5 +311,14 @@ void Environment::genereRobotRecolteur(int nombreRobot) {
             i--;
         }
     }
+}
+
+void Environment::setMap(std::vector<std::vector<Entite *>> &map) {
+    /*
+     * Permet de mettre à jour la map
+     * :param map: nouvelle map
+     */
+    this->map = map;
+
 }
 

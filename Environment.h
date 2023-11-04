@@ -38,6 +38,7 @@ public:
     bool getRunning();
     // setters
     void setRunning(bool running);
+    void setMap(std::vector<std::vector<Entite*>> &map);
 
     // methods
     void initMap(int pourcentageArbre, int nombreRobotArroseur, int nombreRobotPlanteur, int nombreRobotRecolteur);

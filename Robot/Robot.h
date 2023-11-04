@@ -61,23 +61,26 @@ public:
     void setPositionObjectifEnLocal(int x, int y);
 
     // Methods
+    void move(float speedLeft, float speedRight);
+    /*
     void move(Direction direction);
     void move(float speed);
     void move();
     void cinematicMove();
     void turn();
+     */
     void turn(float angle);
     std::vector<std::vector<Entite*>> getScannerData(Environment &env, int range);
     virtual void action(Environment &env);
     virtual void priseDecision(Environment &env);
     void Update(Environment &env);
-    bool isFree();
     void scan(Environment &env, int range);
     float distanceEntreRobotEtObjet( float xObjet, float yObjet);
 
 
     void calculNewPose();
     void moveCinematique(double target_x, double target_y, double max_speed, double delta_t);
+    void moveAleatoire(Environment &env);
 
     void setPose(float d, float d1, float d2);
     float *getPose();
@@ -85,6 +88,7 @@ public:
     // static methods
     static float angle(float x1, float y1, float x2, float y2);
     static float angleRobotArbre(float xRobot, float yRobot, float xArbre, float yArbre, float orientationRobot);
+
 
 };
 
