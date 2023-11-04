@@ -18,7 +18,7 @@
 Environment::Environment(int width, int height)  {
     this->size[0] = width;
     this->size[1] = height;
-
+    this->deltaT = 0.1; // On simule l'environement toute les 100 ms
     // mise en place de la map
     for (int i = 0; i < width; i++) {
         std::vector<Entite *> ligne;
@@ -33,12 +33,9 @@ Environment::Environment(int width, int height)  {
 Environment::~Environment() = default;
 
 // getters
-int *Environment::getSize() {
-    return this->size;
-}
-std::vector<std::vector<Entite *>> Environment::getMap() {
-    return this->map;
-}
+float Environment::getDeltaT() { return this->deltaT; }
+int *Environment::getSize() { return this->size; }
+std::vector<std::vector<Entite *>> Environment::getMap() { return this->map; }
 bool Environment::getRunning() { return this->running; }
 
 // setters
@@ -76,6 +73,7 @@ std::mt19937::result_type Environment::genereteSeed(){
 
     return seed;
 }
+
 void Environment::genereArbre(int pourcentage){
     /*
      * Permet de générer des arbres sur la map
@@ -213,8 +211,7 @@ void Environment::updateMap() {
         else if(item->getNom()=="W"){
             // cast pour avoir sa class
             RobotArroseur* robot = dynamic_cast<RobotArroseur *>(item); // Permet de travailler avec le classe arbre
-            if(robot->getActualManeuver()==Robot::ActualManeuver::Idle)
-                robot->Update(*this); // Permet d'actualiser les données du robot
+            robot->Update(*this); // Permet d'actualiser les données du robot
             robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
             robot->action(*this); // Permet d'agir en fonction de sa décision
         }
@@ -224,8 +221,6 @@ void Environment::updateMap() {
             robot->priseDecision(*this); // Permet de prendre une décision en fonction de sa stratégie et de l'environement
             robot->action(*this); // Permet d'agir en fonction de sa décision
         }
-
-
     }
 }
 
@@ -241,6 +236,8 @@ void Environment::runSimulation() {
     }
 }
 
+
+// TODO : Implémeter une template pour éviter la répétition de code
 void Environment::genereRobotArroseur(int nombreRobot) {
     /*
      * Permet de générer des robots arroseurs sur la map
@@ -311,3 +308,4 @@ void Environment::genereRobotRecolteur(int nombreRobot) {
         }
     }
 }
+

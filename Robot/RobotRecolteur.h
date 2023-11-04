@@ -15,6 +15,8 @@ public:
     ~RobotRecolteur();
 
     // methods
+    void action(Environment &env) override;
+    void priseDecision(Environment &env) override;
     void recolter();
 };
 

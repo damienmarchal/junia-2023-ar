@@ -3,7 +3,8 @@
 #include <vector>
 
 #include "Environment.h"
-
+#include <iostream>
+#include <cmath>
 
 int main() {
     Environment env(7, 7);

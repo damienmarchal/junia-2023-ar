@@ -20,6 +20,7 @@ class Environment {
     std::vector<std::vector<Entite*>> map;
     int size[2];// taile de la map 0:lignes 1:colonnes
     bool running = false;
+    float deltaT;
 public:
     std::vector<Entite *> allRobots;
     std::vector<Entite *> allArbres;
@@ -32,6 +33,7 @@ public:
 
     // getters
     int* getSize();
+    float getDeltaT();
     std::vector<std::vector<Entite*>> getMap();
     bool getRunning();
     // setters
@@ -55,6 +57,10 @@ public:
 
     // General Function
     static std::mt19937::result_type genereteSeed();
+
+
+
+
 };
 
 

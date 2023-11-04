@@ -4,7 +4,6 @@
 
 #include <utility>
 
-
 #include "Robot.h"
 #include "../Arbre.h"
 
@@ -16,12 +15,27 @@ Robot::Robot(int x, int y) : Entite(x, y) {
     this->direction = Direction::Nord;
     this->orientation = 0;
     this->actualManeuver = ActualManeuver::Idle;
+    this->battery = 100;
+    this->batteryMax = 100;
+    this->capacity = 10;
+    this->capacityMax = 10;
+    this->speed = 10;
+    this->speedMax = 10;
+    this->speedWeelRight = 0;
+    this->speedWeelLeft = 0;
+    this->diseriedPose[0] = this->diseriedPose[1] =this->diseriedPose[2] = 0;
+    this->pose[0] =(float)x;
+    this->pose[1] =(float)y;
+    this->pose[2] =0;
+    this->positionObjectifEnLocal[0] = 0;
+    this->positionObjectifEnLocal[1] = 0;
 }
 
 // destructors
 Robot::~Robot() = default;
 
 // getters
+float * Robot::getPose() { return this->pose; }
 float *Robot::getDesiredPose() { return new float[3]{static_cast<float>(this->diseriedPose[0]), static_cast<float>(this->diseriedPose[1]), this->diseriedPose[2]}; }
 float Robot::getOrientation() { return this->orientation; }
 float Robot::getBattery() { return this->battery; }
@@ -50,6 +64,12 @@ void Robot::setDesiredPose(float x, float y, float orientation) {
 void Robot::setPositionObjectifEnLocal(int x, int y) {
     this->positionObjectifEnLocal[0] = x;
     this->positionObjectifEnLocal[1] = y;
+}
+
+void Robot::setPose(float x, float y, float theta) {
+    this->pose[0] = x;
+    this->pose[1] = y;
+    this->pose[2] = theta;
 }
 
 // methods
@@ -182,13 +202,14 @@ void Robot::turn(float angle) {
         this->setActualManeuver(Robot::ActualManeuver::Mouvement); // On met le robot en mode Idle
     }
     else{
+        float precision= 4; // précision de la rotation plus elle est grande plus la rotation est rapide mais moins précise
         // On fait tourner le robot
         if (angle > 0) { // Si l'angle est positif
-            this->setSpeedWeelRight(1);
-            this->setSpeedWeelLeft(-1);
+            this->setSpeedWeelRight(precision);
+            this->setSpeedWeelLeft(-precision);
         } else { // Si l'angle est négatif
-            this->setSpeedWeelRight(-1);
-            this->setSpeedWeelLeft(1);
+            this->setSpeedWeelRight(-precision);
+            this->setSpeedWeelLeft(precision);
         }
     }
 }
@@ -200,6 +221,46 @@ void Robot::priseDecision(Environment &env) {
     return;
 }
 
+void Robot::calculNewPose() {
+    /*
+     * Permet de calculer la nouvelle pose du robot de manière cinématique
+     */
+/*    // TODO : Trouver un moyen de mettre en place des intégrales
+    float rayonRoue =0.03; // rayon de la roue
+    float distanceEntraxe = 0.25; // distance entre les deux roues
+
+    float termeG = (rayonRoue / 2) * (this->getSpeedWeelLeft() + this->getSpeedWeelRight());
+
+    float termeD = (rayonRoue / distanceEntraxe) * (this->getSpeedWeelRight() - this->getSpeedWeelLeft());
+
+    float newX = this->getPose()[0] + (termeG * std::cos(termeD)); // les deux termes de la multiplication doivent être intégrés
+    float newY = this->getPose()[1] + (termeG * std::sin(termeD)); // les deux termes de la multiplication doivent être intégrés
+    float newOrientation = this->getPose()[2] + (termeD); // le terme de la multiplication doit être intégré
+*/
+
+    float delta_t = 0.1; // C'est le temps entre chaque calcul de pose
+
+    float v_left = this->getSpeedWeelLeft();
+    float v_right = this->getSpeedWeelRight();
+
+    float newX = this->getPose()[0];
+    float newY = this->getPose()[1];
+    float newTheta = this->getPose()[2];
+
+    // Calculate linear and angular velocity of the robot
+    float v = (v_left + v_right) / 2.0;
+    float omega = (v_right - v_left) / this->entraxe;
+
+    // Update the pose of the robot
+    newX += v * std::cos(newTheta) * delta_t;
+    newY += v * std::sin(newTheta) * delta_t;
+    newTheta += omega * delta_t;
+
+    this->setPose(newX, newY, newTheta);
+
+}
+
+
 void Robot::Update(Environment &env) {
     /*
      * Permet de mettre à jour les données du robot
@@ -207,8 +268,8 @@ void Robot::Update(Environment &env) {
     // TODO : mettre à jour les données du robot
     // Nouvelle carte
     this->localMap = this->getScannerData(env, 1);
-    // Nouvelle position
-    // Nouvelle orientation
+    // Nouvelle pose
+    this->calculNewPose();
     // Nouvelle direction
     // Nouvelle batterie
     // Nouvelle capacité
@@ -304,3 +365,30 @@ float Robot::angle(float x1, float y1, float x2, float y2) {
 }
 
 
+
+// Fonction pour déplacer le robot à une position donnée
+void Robot::moveCinematique(double target_x, double target_y, double max_speed, double delta_t) {
+    double delta_x = target_x - this->pose[0];
+    double delta_y = target_y - this->pose[1];
+    double distance_to_target = std::sqrt(delta_x * delta_x + delta_y * delta_y);
+
+    if (distance_to_target < 0.01) {
+        // Le robot est déjà proche de la cible, pas besoin de bouger
+        return;
+    }
+
+    double target_theta = std::atan2(delta_y, delta_x);
+
+    // Calculez la vitesse linéaire cible en limitant la vitesse à max_speed
+    double target_v = std::min(max_speed, distance_to_target / delta_t);
+
+    // Calculez la vitesse angulaire cible pour tourner vers la cible
+    double delta_theta = target_theta - this->pose[2];
+    double target_omega = delta_theta / delta_t;
+
+    // Mettez à jour les vitesses des roues pour atteindre la cible
+    double v_left = target_v - this->entraxe * target_omega / 2.0;
+    double v_right = target_v + this->entraxe * target_omega / 2.0;
+    this->setSpeedWeelLeft((float)v_left);
+    this->setSpeedWeelRight((float)v_right);
+}

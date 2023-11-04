@@ -108,7 +108,7 @@ void RobotArroseur::action(Environment &env) {
         }
         else
         // On se déplace jusqu'à la pose désirée
-            this->cinematicMove();
+            this->moveCinematique(xd, yd, this->getSpeed(), env.getDeltaT());
         return;
     }
     else if(this->getActualManeuver() == Robot::ActualManeuver::SpecialAction) { // une direction est déjà définie
