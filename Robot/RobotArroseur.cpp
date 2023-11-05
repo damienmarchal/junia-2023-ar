@@ -25,9 +25,11 @@ void RobotArroseur::arroser(Environment &env) {
     // Récupère l'arbre sur lequel le robot est
     std::cout << "Le robot arrose l'arbre en position : (" <<this->getDesiredPose()[0]<<";"<<this->getDesiredPose()[1]<<")"<< std::endl;
 
-    // Vériie que le robot est sur un arbre
-    if(env.getMap()[(int)this->diseriedPose[0]][(int)this->diseriedPose[1]]->getNom() == "A"){
-        std::cerr << "Erreur : le robot n'est pas sur un arbre" << std::endl;
+    // Vériie que le robot est à porter de l'arbre
+    float distance = Environment::CalculDistance(this->getPose()[0],this->getPose()[1],this->getDesiredPose()[0],this->getDesiredPose()[1]);
+    if(distance> 1){
+
+        std::cerr << "Erreur : le robot n'est pas à porter de l'arbre\n\t Distance entre robot et arbre : " << distance <<std::endl;
         return;
     }
     else // Si c'est le cas
@@ -99,17 +101,15 @@ void RobotArroseur::action(Environment &env) {
      * l'action est la suivante : si on est sur un arbre, on l'arrose
      * sinon on se déplace jusqu'à trouver un arbre à arroser
      */
-    this->move(5,5);
-    return;
 
     // Vérifie s'il y a déjà une pose disérer à atteindre
     if(this->getActualManeuver() == Robot::ActualManeuver::Mouvement) { // une direction est déjà définie
-        float margin = 0.01; // marge d'erreur pour la pose
+        float margin = 1.0; // marge d'erreur pour la pose
         float xd = this->getDesiredPose()[0];
         float yd = this->getDesiredPose()[1];
         auto x = (float)this->getPose()[0];
         auto y = (float)this->getPose()[1];
-        if(xd - margin <= x && x <= xd + margin && yd - margin <= y && y <= yd + margin) {
+        if(Environment::CalculDistance(xd,yd,x,y) <= margin) {
             // Si on est sur la pose désirée
             this->setActualManeuver(Robot::ActualManeuver::SpecialAction); // On met le robot en mode arrosage
         }

@@ -11,8 +11,10 @@ class RobotPlanteur : public Robot{
 public:
     RobotPlanteur(int x, int y);
     void planter(Environment &env);
-    void action(Environment &env);
-    bool isFreeZoneToPlant();
+    bool isFreeZoneToPlant(Environment &env, int x, int y);
+
+    void action(Environment &env) override;
+    void priseDecision(Environment &env) override;
 };
 
 

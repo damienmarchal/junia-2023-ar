@@ -19,7 +19,7 @@ Robot::Robot(int x, int y) : Entite(x, y) {
     this->batteryMax = 100;
     this->capacity = 10;
     this->capacityMax = 10;
-    this->speed = 0.7;
+    this->speed = 1;
     this->speedMax = 1;
     this->speedWeelRight = 0;
     this->speedWeelLeft = 0;
@@ -94,8 +94,8 @@ std::vector<std::vector<Entite*>> Robot::getScannerData(Environment &env, int ra
     std::vector<std::vector<Entite*>> map = env.getMap();
     std::vector<std::vector<Entite*>> data; // tableau de données
     // on récupère la position du robot
-    int x = this-> getPosition()[0];
-    int y = this-> getPosition()[1];
+    auto x =(int) this-> getPose()[0];
+    auto y =(int) this-> getPose()[1];
 
     // on parcours les cases autour du robot
     switch (range) {
@@ -217,9 +217,11 @@ void Robot::Update(Environment &env) {
     /*
      * Permet de mettre à jour les données du robot
      */
-    // TODO : mettre à jour les données du robot
+
     // Nouvelle carte
     this->localMap = this->getScannerData(env, 1);
+
+    // Ancienne pose
     float lastPoseX = this->getPose()[0];
     float lastPoseY = this->getPose()[1];
     // Nouvelle pose
@@ -227,17 +229,25 @@ void Robot::Update(Environment &env) {
     // Actualisation de la pose sur la carte
     float newPoseX = this->getPose()[0];
     float newPoseY = this->getPose()[1];
-    if((int)newPoseX != (int)lastPoseX || (int)newPoseY != (int)lastPoseY){
+
+    if((int)newPoseX != (int)lastPoseX || (int)newPoseY != (int)lastPoseY){ // Si le robot a bougé
         // récupère la carte de l'environement
         std::vector<std::vector<Entite*>> map = env.getMap();
         // Actualisation de la position du robot sur la carte
-        map[(int)newPoseX][(int)newPoseY] = this; // change la position du robot sur la carte
-        // Suppression de l'ancienne position du robot sur la carte
-        map[(int)lastPoseX][(int)lastPoseY] = new Entite((int)lastPoseX,(int)lastPoseY);
-        // Actualisation de la carte de l'environnement
-        env.setMap(map);
+        if(map[(int)newPoseX][(int)newPoseY]->getNom()!="_") // Si la case n'est pas vide
+        {
+            std::cerr << "Erreur : la case n'est pas vide" << std::endl;
+            this->setPose(lastPoseX,lastPoseY,this->getPose()[2]); // On remet le robot à sa position précédente
+        }
+        else // Si la case est vide (on peut bouger
+        {
+            map[(int)newPoseX][(int)newPoseY] = this; // change la position du robot sur la carte
+            // Suppression de l'ancienne position du robot sur la carte
+            map[(int)lastPoseX][(int)lastPoseY] = new Entite((int)lastPoseX,(int)lastPoseY);
+            // Actualisation de la carte de l'environnement
+            env.setMap(map);
+        }
     }
-    return;
 }
 
 // calcul de l'angle entre un robot et un arbre
@@ -284,19 +294,6 @@ void Robot::moveAleatoire(Environment &env) {
     std::uniform_int_distribution<unsigned> distrib(1, std::max(env.getSize()[0], env.getSize()[1]) - 1);
     // On génère une position aléatoire
     this->setPose(distrib(gen), distrib(gen), 0);
-}
-
-// Static methods
-float Robot::distanceEntreRobotEtObjet( float xObjet, float yObjet) {
-    /*
-     * Permet de calculer la distance entre le robot et un objet
-     * @param xObjet: position x de l'objet
-     * @param yObjet: position y de l'objet
-     */
-    auto x = (float)this->getPosition()[0];
-    auto y = (float)this->getPosition()[1];
-
-    return (float) std::sqrt(pow(xObjet - x, 2) + pow(yObjet - y, 2));
 }
 
 float Robot::angle(float x1, float y1, float x2, float y2) {

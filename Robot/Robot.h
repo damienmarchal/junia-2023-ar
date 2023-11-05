@@ -15,7 +15,7 @@
 class Robot : public Entite {
 public:
 // Attributs
-    enum class ActualManeuver { Mouvement,Turn, SpecialAction, Idle };
+    enum class ActualManeuver { Mouvement, SpecialAction, Idle };
     ActualManeuver actualManeuver;
     enum class Direction { Nord,Est,Sud,Ouest };
     Direction direction;
@@ -71,12 +71,8 @@ public:
      */
     void turn(float angle);
     std::vector<std::vector<Entite*>> getScannerData(Environment &env, int range);
-    virtual void action(Environment &env);
-    virtual void priseDecision(Environment &env);
     void Update(Environment &env);
     void scan(Environment &env, int range);
-    float distanceEntreRobotEtObjet( float xObjet, float yObjet);
-
 
     void calculNewPose();
     void moveCinematique(double target_x, double target_y, double max_speed, double delta_t);
@@ -84,6 +80,10 @@ public:
 
     void setPose(float d, float d1, float d2);
     float *getPose();
+
+    // virtual methods
+    virtual void action(Environment &env);
+    virtual void priseDecision(Environment &env);
 
     // static methods
     static float angle(float x1, float y1, float x2, float y2);

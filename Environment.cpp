@@ -322,3 +322,10 @@ void Environment::setMap(std::vector<std::vector<Entite *>> &map) {
 
 }
 
+float Environment::CalculDistance(float x1, float y1, float x2, float y2) {
+    /*
+     * Permet de calculer la distance entre deux points
+     */
+    return (float)std::sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2) * 1.0);
+}
+

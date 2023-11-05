@@ -36,6 +36,7 @@ public:
     float getDeltaT();
     std::vector<std::vector<Entite*>> getMap();
     bool getRunning();
+
     // setters
     void setRunning(bool running);
     void setMap(std::vector<std::vector<Entite*>> &map);
@@ -45,10 +46,7 @@ public:
     void printMap();
     void updateMap();
     void runSimulation();
-    void addArbre(Arbre arbre, int x, int y);
-
-    // TODO : changer les fonctions arooser pour les mettre dans la classe robot
-    //void arroser(Robot* robot); // arrose les cases autour du robot
+    void addArbre(int x, int y);
 
     void genereArbre(int pourcentage);
     void genereRobot(int nombreRobotArroseur, int nombreRobotPlanteur, int nombreRobotRecolteur);
@@ -56,9 +54,9 @@ public:
     void genereRobotArroseur(int nombreRobot);
     void genereRobotRecolteur(int nombreRobot);
 
-    // General Function
+    // Static Function
     static std::mt19937::result_type genereteSeed();
-
+    static float CalculDistance(float x1, float y1, float x2, float y2);
 
 
 
