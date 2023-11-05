@@ -178,18 +178,6 @@ void Robot::calculNewPose() {
     /*
      * Permet de calculer la nouvelle pose du robot de manière cinématique
      */
-/*    // TODO : Trouver un moyen de mettre en place des intégrales
-    float rayonRoue =0.03; // rayon de la roue
-    float distanceEntraxe = 0.25; // distance entre les deux roues
-
-    float termeG = (rayonRoue / 2) * (this->getSpeedWeelLeft() + this->getSpeedWeelRight());
-
-    float termeD = (rayonRoue / distanceEntraxe) * (this->getSpeedWeelRight() - this->getSpeedWeelLeft());
-
-    float newX = this->getPose()[0] + (termeG * std::cos(termeD)); // les deux termes de la multiplication doivent être intégrés
-    float newY = this->getPose()[1] + (termeG * std::sin(termeD)); // les deux termes de la multiplication doivent être intégrés
-    float newOrientation = this->getPose()[2] + (termeD); // le terme de la multiplication doit être intégré
-*/
 
     float delta_t = 0.1; // C'est le temps entre chaque calcul de pose
 
@@ -236,8 +224,12 @@ void Robot::Update(Environment &env) {
         // Actualisation de la position du robot sur la carte
         if(map[(int)newPoseX][(int)newPoseY]->getNom()!="_") // Si la case n'est pas vide
         {
-            std::cerr << "Erreur : la case n'est pas vide" << std::endl;
+            std::cerr << "Erreur : la case n'est pas vide\n\t il y a :"<< map[(int)newPoseX][(int)newPoseY]->getNom()<< std::endl;
             this->setPose(lastPoseX,lastPoseY,this->getPose()[2]); // On remet le robot à sa position précédente
+            // TODO : Trouver un moyen de faire en sorte que le robot ne se bloque pas
+            // Pour le moment on le dit de repartir dans une direction aléatoire
+            this->moveAleatoire(env);
+
         }
         else // Si la case est vide (on peut bouger
         {

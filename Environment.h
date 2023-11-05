@@ -24,6 +24,7 @@ class Environment {
 public:
     std::vector<Entite *> allRobots;
     std::vector<Entite *> allArbres;
+    // TODO : Ajouter une station de recharge pour les robots (par défaut, elle est en (1,1))
 
     // constructor
     Environment(int x, int y);
@@ -46,7 +47,7 @@ public:
     void printMap();
     void updateMap();
     void runSimulation();
-    void addArbre(int x, int y);
+    int addArbre(int x, int y);
 
     void genereArbre(int pourcentage);
     void genereRobot(int nombreRobotArroseur, int nombreRobotPlanteur, int nombreRobotRecolteur);

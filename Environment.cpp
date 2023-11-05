@@ -172,6 +172,7 @@ void Environment::initMap(int pourcentageArbre, int nombreRobotArroseur, int nom
             }
         }
     }
+    // TODO : Ajouter une station de recharge (par défaut en 1,1)
 
     // on ajoute des arbres aléatoirement
     genereArbre(pourcentageArbre);
@@ -327,5 +328,22 @@ float Environment::CalculDistance(float x1, float y1, float x2, float y2) {
      * Permet de calculer la distance entre deux points
      */
     return (float)std::sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2) * 1.0);
+}
+
+int Environment::addArbre(int x, int y) {
+    /*
+     * Permet d'ajouter un arbre à la map
+     * :param x: position en x
+     * :param y: position en y
+     */
+    // Vérifie si l'on peut ajouter un arbre à la position donnée
+    if(this->map[x][y]->getNom() != "_"){
+        std::cerr << "Erreur : Impossible d'ajouter un arbre à la ("<<x<<";"<<y<<")" << std::endl;
+        return -1;
+    }
+    Arbre *arbre = new Arbre(x, y, false);
+    this->allArbres.push_back(arbre); // on ajoute l'arbre à la liste des arbres
+    this->map[x][y] = arbre; // on ajoute l'arbre à la map
+    return 1;
 }
 

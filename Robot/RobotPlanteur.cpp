@@ -13,35 +13,47 @@ RobotPlanteur::RobotPlanteur(int x, int y) : Robot(x, y) {
 }
 
 // methods
-void RobotPlanteur::planter(Environment &env) {
+void RobotPlanteur::planter(Environment &env, int x, int y) {
     /*
      * Permet de planter un arbre
      */
     // Vérifier que le robot a des graines
-    if(this->getCapacity()<0){
-        // TODO : si le robot n'a pas de graine, il va chercher des graines
-        // TODO : Peut-être mettre en place un système de stratégie par fifo
+    if(this->getCapacity()<=0){
+        std::cerr << "Erreur : le robot n'a pas de graines" << std::endl;
+        return;
     }
     else {
-        // TODO : vérifier qu'une zone de plantation est disponible
-        if (this->isFreeZoneToPlant()) {
-            // TODO : planter un arbre
+        if (this->isFreeZoneToPlant(env, x, y)) { // Vérifie que la zone est libre
+            if(env.addArbre(x, y) ==1)
+                this->setCapacity(this->getCapacity()-1); // On enlève une graine si l'on a réussi à planter
         }
         else {
-            // TODO : si la zone de plantation n'est pas disponible, le robot va chercher une zone de plantation
-            // TODO : Peut-être mettre en place un système de stratégie par fifo
+            return;
         }
     }
 }
 
 void RobotPlanteur::action(Environment &env) {
     /*
-     * Permet de faire l'action du robot
+     * Permet de faire l'action du robot en fonction de son mode
      */
+    switch (this->getActualManeuver()) {
+        case ActualManeuver::Mouvement:
+            if(Environment::CalculDistance((this->getPose()[0]),(this->getPose()[1]),(this->getDesiredPose()[0]),(this->getDesiredPose()[1]))>=.51)
+                this->moveCinematique(this->getDesiredPose()[0],this->getDesiredPose()[1],this->getSpeed(),env.getDeltaT());
+            else
+                this->setActualManeuver(Robot::ActualManeuver::Idle);
+            break;
 
-    this->planter(env);
+        case ActualManeuver::SpecialAction:
+            this->planter(env,(int)this->getDesiredPose()[0],(int)this->getDesiredPose()[1]); // TODO : vérifier que la position est bien la bonne
+            this->setActualManeuver(Robot::ActualManeuver::Idle);
+            break;
 
-    // TODO : Mettre en place une stratégie de déplacement
+        case ActualManeuver::Idle:
+            this->setSpeed(0);// On arrête le robot
+            break;
+    }
 }
 
 void RobotPlanteur::priseDecision(Environment &env) {
@@ -53,7 +65,8 @@ void RobotPlanteur::priseDecision(Environment &env) {
     if(this->getActualManeuver()==Robot::ActualManeuver::Idle || this->getActualManeuver()==Robot::ActualManeuver::Mouvement){
         // Vérifie que l'on a des graines
         if(this->getCapacity()<=0){
-            // TODO : si le robot n'a pas de graine, il va chercher des graines
+            this->setDesiredPose(1,1,0); // On retourne à la case de départ
+            this->setActualManeuver(Robot::ActualManeuver::Mouvement); // On passe en mode mouvement
             return;
         }
         else{ // Si l'on a des graines
@@ -66,7 +79,7 @@ void RobotPlanteur::priseDecision(Environment &env) {
             // On regarde si une zone de plantation est disponible
             for(int i=0;i<this->getLocalMap().size();i++){
                 for(int j=0;j<this->getLocalMap().size();j++){
-                    if(this->isFreeZoneToPlant(env,i,j)){ // Si une zone de plantation est disponible
+                    if(this->isFreeZoneToPlant(env,this->getLocalMap()[i][j]->getPosition()[0],this->getLocalMap()[i][j]->getPosition()[1])){ // Si une zone de plantation est disponible
                         // Enregistrer la position de la zone de plantation
                         this->setDesiredPose( this->getLocalMap()[i][j]->getPosition()[0], this->getLocalMap()[i][j]->getPosition()[1],0);
                         this->setActualManeuver(Robot::ActualManeuver::SpecialAction); // On passe en mode plantation
@@ -81,25 +94,31 @@ void RobotPlanteur::priseDecision(Environment &env) {
              * si la case est libre, sinon de se déplacer d'une case vers le bas
              * sinon on retourne à la case de départ ( 1,1 ) c'est là on l'on aura la station de recharge
              */
+            // On doit déjà avoir un emplacement car on est en  déplacement
+            if(this->getActualManeuver()==Robot::ActualManeuver::Mouvement){ return; } // On ne fait rien de plus car on est déjà en train de se déplacer
+            // sinon on effectue la sratégie de base
+
             // On regarde si la case à droite est libre
-            if(this->getLocalMap()[this->getPosition()[0]+1][this->getPosition()[1]]->getNom()=="_"){
+            if(env.getMap()[this->getPose()[0]][this->getPose()[1]+1]->getNom()=="_"){
                 // On enregistre la position de la case à droite
-                this->setDesiredPose(this->getPosition()[0]+1,this->getPosition()[1],0);
+                this->setDesiredPose(this->getPose()[0],this->getPose()[1]+1,0);
                 this->setActualManeuver(Robot::ActualManeuver::Mouvement); // On passe en mode mouvement
                 return;
             }
             // On regarde si la case en bas est libre
-            else if(this->getLocalMap()[this->getPosition()[0]][this->getPosition()[1]+1]->getNom()=="_"){
+            else if(env.getMap()[this->getPose()[0]+1][this->getPose()[1]]->getNom()=="_"){
                 // On enregistre la position de la case en bas
-                this->setDesiredPose(this->getPosition()[0],this->getPosition()[1]+1,0);
+                this->setDesiredPose(this->getPose()[0]+1,this->getPose()[1],0);
                 this->setActualManeuver(Robot::ActualManeuver::Mouvement); // On passe en mode mouvement
                 return;
             }
             // Si on arrive ici, c'est que les cases à droite et en bas ne sont pas libres
             // On retourne à la case de départ
-            this->setDesiredPose(1,1,0);
-            this->setActualManeuver(Robot::ActualManeuver::Mouvement); // On passe en mode mouvement
-            return;
+            else{
+                this->setDesiredPose(1,1,0);
+                this->setActualManeuver(Robot::ActualManeuver::Mouvement); // On passe en mode mouvement
+                return;
+            }
         }
     }
     else if(this->getActualManeuver()==Robot::ActualManeuver::SpecialAction){
@@ -114,7 +133,6 @@ void RobotPlanteur::priseDecision(Environment &env) {
     else{
         std::cerr << "Erreur : le robot n'est pas dans un état connu" << std::endl;
     }
-    return;
 }
 
 bool RobotPlanteur::isFreeZoneToPlant(Environment &env, int x, int y) {
@@ -122,18 +140,26 @@ bool RobotPlanteur::isFreeZoneToPlant(Environment &env, int x, int y) {
      * Permet de vérifier si la zone de plantation est libre
      */
     // Vérifie que les paramètres sont bien dans la map
-    if(x<1 || x>env.getMap().size() || y<1 || y>env.getMap().size()){
-        std::cerr << "Erreur : les paramètres ne sont pas dans la map" << std::endl;
+    if(x<0 || x>=env.getSize()[0] || y<0 || y>=env.getSize()[1]){
+        //std::cerr << "Erreur : les paramètres ne sont pas dans la map" << std::endl;
         return false;
     }
     // Vérifie autour de la zone donnée en paramètre avec un rayon de 1 s'il y a un obstacle
     for(int i=x-1; i<=x+1; i++){
         for(int j=y-1; j<=y+1; j++){
-            if(env.getMap()[i][j]->getNom()!="_"){
-                return false;
+            // Vérifie que les paramètres sont bien dans la map
+            if(i<0 || i>=env.getSize()[0] || j<0 || j>=env.getSize()[1]){
+               // std::cerr << "Erreur : les paramètres ne sont pas dans la map" << std::endl;
+                continue;
+            }
+            if(env.getMap()[i][j]->getNom()=="A"){ // Si il y a un arbre
+                return false; // On retourne faux
             }
         }
     }
-    return true;
+    if(env.getMap()[x][y]->getNom()=="_") // Si à la position donnée en paramètre il y a rien
+        return true; // On retourne vrai
+    else // S'il y a un obstacle
+        return false; // On retourne faux
 }
 

@@ -10,7 +10,7 @@
 class RobotPlanteur : public Robot{
 public:
     RobotPlanteur(int x, int y);
-    void planter(Environment &env);
+    void planter(Environment &env, int x, int y);
     bool isFreeZoneToPlant(Environment &env, int x, int y);
 
     void action(Environment &env) override;
